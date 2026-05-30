@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Arjun — Visual Storyteller</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --e:  #1A0F07;
+  --e2: #221408;
+  --e3: #2C1B0E;
+  --e4: #382214;
+  --s:  #C2501F;
+  --s2: #D96830;
+  --s3: #A03E12;
+  --c:  #F4ECD7;
+  --c2: #E6D8B8;
+  --c3: #C0A87C;
+  --c4: #7A6040;
+  --bd: rgba(194,80,31,0.14);
+  --bd2:rgba(244,236,215,0.07);
+  --bb:'Bebas Neue',sans-serif;
+  --dm:'DM Sans',sans-serif;
+  --mo:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--e);color:var(--c);font-family:var(--dm);font-weight:300;line-height:1.7;overflow-x:hidden;cursor:none;}
+
+/* ── CURSOR ── */
+.cur{position:fixed;width:6px;height:6px;background:var(--s);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:normal;}
+.cur-ring{position:fixed;width:30px;height:30px;border:1px solid rgba(194,80,31,0.45);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:width .4s,height .4s,border-color .3s;}
+.cur-ring.big{width:58px;height:58px;border-color:rgba(194,80,31,0.15);}
+
+/* grain */
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:1;opacity:.8;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.6rem 4rem;display:flex;justify-content:space-between;align-items:center;transition:all .4s;}
+nav.sc{background:rgba(26,15,7,0.97);padding:1rem 4rem;border-bottom:1px solid var(--bd);backdrop-filter:blur(14px);}
+.nlogo{font-family:var(--mo);font-size:.8rem;letter-spacing:.14em;color:var(--c);text-decoration:none;}
+.nlogo span{color:var(--s);}
+.nlinks{display:flex;gap:2.5rem;list-style:none;}
+.nlinks a{color:var(--c4);text-decoration:none;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:400;transition:color .3s;}
+.nlinks a:hover{color:var(--s2);}
+.ncta{background:var(--s);color:var(--c);font-family:var(--dm);font-size:.68rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;padding:.6rem 1.4rem;text-decoration:none;transition:background .3s;}
+.ncta:hover{background:var(--s2);}
+.hbg{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:none;}
+.hbg span{display:block;width:22px;height:1px;background:var(--c4);}
+
+/* Mobile menu */
+.mm{position:fixed;inset:0;background:var(--e2);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;transform:translateX(100%);transition:transform .5s cubic-bezier(.4,0,.2,1);}
+.mm.open{transform:translateX(0);}
+.mm a{font-family:var(--bb);font-size:3.5rem;letter-spacing:.06em;color:var(--c);text-decoration:none;transition:color .3s;}
+.mm a:hover{color:var(--s2);}
+.mm-close{position:absolute;top:1.5rem;right:1.5rem;background:none;border:none;color:var(--c4);font-size:.9rem;cursor:none;font-family:var(--mo);}
+
+/* ══════════════════════
+   TYPEWRITER HERO
+══════════════════════ */
+#hero{
+  position:relative;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  overflow:hidden;
+  padding:2rem 4rem;
+  text-align:center;
+}
+
+/* Radial warm glow behind name */
+#hero::before{
+  content:'';position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-52%);
+  width:900px;height:600px;
+  background:radial-gradient(ellipse,rgba(194,80,31,0.07) 0%,transparent 65%);
+  pointer-events:none;z-index:0;
+}
+
+/* Vignette edges */
+.h-vig{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 90% 90% at 50% 50%,transparent 35%,rgba(26,15,7,0.92) 100%);
+  pointer-events:none;z-index:1;
+}
+
+/* Film corner brackets */
+.h-corner{position:absolute;width:24px;height:24px;pointer-events:none;z-index:3;}
+.h-corner.tl{top:1.75rem;left:1.75rem;border-top:1px solid rgba(194,80,31,.35);border-left:1px solid rgba(194,80,31,.35);}
+.h-corner.tr{top:1.75rem;right:1.75rem;border-top:1px solid rgba(194,80,31,.35);border-right:1px solid rgba(194,80,31,.35);}
+.h-corner.bl{bottom:1.75rem;left:1.75rem;border-bottom:1px solid rgba(194,80,31,.35);border-left:1px solid rgba(194,80,31,.35);}
+.h-corner.br{bottom:1.75rem;right:1.75rem;border-bottom:1px solid rgba(194,80,31,.35);border-right:1px solid rgba(194,80,31,.35);}
+
+/* Side labels */
+.h-side-l{position:absolute;left:1.25rem;top:50%;transform:translateY(-50%) rotate(-90deg);font-family:var(--mo);font-size:.52rem;letter-spacing:.22em;text-transform:uppercase;color:var(--c4);white-space:nowrap;z-index:3;opacity:0;transition:opacity 1s ease;}
+.h-side-r{position:absolute;right:1.25rem;top:50%;transform:translateY(-50%) rotate(90deg);font-family:var(--mo);font-size:.52rem;letter-spacing:.22em;text-transform:uppercase;color:var(--c4);white-space:nowrap;z-index:3;opacity:0;transition:opacity 1s ease;}
+
+/* ── INNER CONTENT ── */
+.h-inner{
+  position:relative;z-index:2;
+  width:100%;
+  display:flex;flex-direction:column;
+  align-items:center;
+  gap:0;
+}
+
+/* Pre-label above name */
+.h-credit{
+  font-family:var(--mo);font-size:.62rem;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--s);
+  margin-bottom:1.75rem;
+  opacity:0;transition:opacity .8s ease;
+}
+
+/* THE NAME — typewriter target */
+.h-name-row{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  line-height:.88;
+}
+.h-name-display{
+  font-family:var(--bb);
+  font-size:clamp(5.5rem,17vw,18rem);
+  letter-spacing:.06em;
+  color:var(--c);
+  white-space:nowrap;
+  min-height:1em;
+  display:inline-block;
+}
+/* Blinking cursor */
+.h-cursor{
+  display:inline-block;
+  width:clamp(4px,1.2vw,12px);
+  height:.8em;
+  background:var(--s);
+  margin-left:4px;
+  vertical-align:middle;
+  animation:blink .75s step-end infinite;
+}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* Divider line below name */
+.h-divider{
+  width:0;height:1px;
+  background:linear-gradient(to right,transparent,rgba(194,80,31,.6),transparent);
+  margin:1.75rem auto;
+  transition:width 1.2s cubic-bezier(.4,0,.2,1);
+}
+
+/* Tagline — mono, small, centered */
+.h-tagline-block{
+  display:flex;flex-direction:column;
+  align-items:center;gap:.6rem;
+  opacity:0;transition:opacity .9s ease;
+}
+.h-tagline-main{
+  font-family:var(--mo);
+  font-size:clamp(.62rem,1.1vw,.85rem);
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--c3);
+  line-height:1.8;
+}
+.h-tagline-main em{font-style:normal;color:var(--s2);}
+.h-tagline-sub{
+  font-family:var(--mo);
+  font-size:clamp(.55rem,.9vw,.72rem);
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--c4);
+}
+
+/* Bottom stats + CTA */
+.h-bottom{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  width:100%;
+  margin-top:4rem;
+  padding-top:2rem;
+  border-top:1px solid var(--bd2);
+  opacity:0;transition:opacity .9s ease;
+}
+.h-stats{display:flex;gap:0;}
+.hst{padding:0 2.5rem 0 0;border-right:1px solid var(--bd2);margin-right:2.5rem;}
+.hst:last-child{border-right:none;margin-right:0;}
+.hst-n{font-family:var(--bb);font-size:2rem;color:var(--s2);line-height:1;letter-spacing:.03em;}
+.hst-l{font-family:var(--mo);font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:var(--c4);margin-top:.2rem;}
+.h-ctas{display:flex;gap:1.25rem;align-items:center;}
+.btn-p{background:var(--s);color:var(--c);font-family:var(--dm);font-size:.72rem;font-weight:500;letter-spacing:.1em;text-transform:uppercase;padding:.9rem 2.25rem;text-decoration:none;transition:all .3s;display:inline-block;}
+.btn-p:hover{background:var(--s2);transform:translateY(-2px);}
+.btn-g{color:var(--c4);font-size:.72rem;text-decoration:none;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid var(--bd);padding-bottom:2px;transition:color .3s;}
+.btn-g:hover{color:var(--s2);}
+
+/* ── KEYFRAMES ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+@keyframes sideIn{from{opacity:0;}to{opacity:1;}}
+
+/* ── MARQUEE ── */
+.mq-wrap{overflow:hidden;background:var(--e3);border-top:1px solid var(--bd);border-bottom:1px solid var(--bd);padding:.85rem 0;}
+.mq-track{display:flex;white-space:nowrap;animation:mq 32s linear infinite;}
+.mi{font-family:var(--mo);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c4);padding:0 2rem;border-right:1px solid var(--bd2);flex-shrink:0;}
+.mi.ac{color:var(--s2);}
+@keyframes mq{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ── SHARED ── */
+section{position:relative;z-index:2;}
+.wrap{max-width:1200px;margin:0 auto;padding:7rem 4rem;}
+.slbl{font-family:var(--mo);font-size:.6rem;letter-spacing:.2em;text-transform:uppercase;color:var(--s);margin-bottom:1.25rem;display:flex;align-items:center;gap:.75rem;}
+.slbl::before{content:'';display:block;width:28px;height:1px;background:var(--s);}
+.stit{font-family:var(--bb);font-size:clamp(3rem,5.5vw,5rem);font-weight:400;line-height:.9;letter-spacing:.02em;margin-bottom:3rem;}
+.stit .si{color:var(--s2);}
+.stit .out{-webkit-text-stroke:1.5px var(--c3);color:transparent;}
+
+/* Reveal */
+.r{opacity:0;transform:translateY(32px);transition:opacity .75s ease,transform .75s ease;}
+.r.on{opacity:1;transform:translateY(0);}
+.d1{transition-delay:.1s;}.d2{transition-delay:.2s;}.d3{transition-delay:.3s;}.d4{transition-delay:.4s;}
+
+/* ── ABOUT ── */
+#about{background:var(--e2);}
+.ab-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:6rem;align-items:start;}
+.ab-body p{color:var(--c2);line-height:1.85;margin-bottom:1.4rem;font-size:.975rem;}
+.ab-body p strong{color:var(--c);font-weight:500;}
+.ab-quad{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--bd);margin-top:2.5rem;}
+.qc{padding:1.5rem;border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);}
+.qc:nth-child(2n){border-right:none;}
+.qc:nth-child(3),.qc:nth-child(4){border-bottom:none;}
+.qn{font-family:var(--bb);font-size:2.5rem;color:var(--s2);line-height:1;letter-spacing:.03em;}
+.ql{font-family:var(--mo);font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;color:var(--c4);margin-top:.25rem;}
+.ab-right{display:flex;flex-direction:column;gap:1.25rem;}
+.acard{border:1px solid var(--bd);padding:2rem;position:relative;overflow:hidden;transition:border-color .35s,background .35s;}
+.acard:hover{background:rgba(194,80,31,.04);border-color:rgba(194,80,31,.3);}
+.acard-bar{position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--s);}
+.acard-tag{font-family:var(--mo);font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;color:var(--s);margin-bottom:.6rem;}
+.acard-title{font-size:1rem;font-weight:500;margin-bottom:.45rem;}
+.acard-body{font-size:.82rem;color:var(--c3);line-height:1.65;}
+
+/* ── SKILLS ── */
+#skills{background:var(--e);}
+.sk-intro{display:grid;grid-template-columns:1fr 1fr;gap:5rem;margin-bottom:4rem;align-items:start;}
+.sk-intro-txt{font-size:.95rem;color:var(--c2);line-height:1.85;}
+.sk-intro-txt p{margin-bottom:1rem;}
+.sk-intro-txt strong{color:var(--c);font-weight:500;}
+.skit{padding:1.6rem 0;border-bottom:1px solid var(--bd2);}
+.skit:first-child{border-top:1px solid var(--bd2);}
+.sk-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.5rem;}
+.sk-name{font-size:1rem;font-weight:500;}
+.sk-pct{font-family:var(--mo);font-size:.6rem;color:var(--s);}
+.sk-desc{font-size:.78rem;color:var(--c4);line-height:1.6;margin-bottom:.75rem;}
+.sk-track{height:1px;background:rgba(194,80,31,.1);}
+.sk-fill{height:1px;background:linear-gradient(to right,var(--s3),var(--s2));width:0;transition:width 1.3s cubic-bezier(.4,0,.2,1);}
+.sk-chips{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.65rem;}
+.skchip{font-family:var(--mo);font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--bd);padding:.2rem .55rem;color:var(--c4);}
+.tools-sec{margin-top:4rem;}
+.tools-lbl{font-family:var(--mo);font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--c4);margin-bottom:1.25rem;}
+.tools-row{display:flex;gap:1px;flex-wrap:wrap;background:var(--bd);}
+.tblock{background:var(--e2);padding:1.5rem 1.75rem;flex:1 1 160px;border:1px solid var(--bd);transition:background .3s,border-color .3s;}
+.tblock:hover{background:var(--e3);border-color:rgba(194,80,31,.3);}
+.tname{font-size:.85rem;font-weight:500;color:var(--c);margin-bottom:.15rem;}
+.tcat{font-family:var(--mo);font-size:.52rem;letter-spacing:.1em;text-transform:uppercase;color:var(--s);}
+
+/* ── WORK / PORTFOLIO ── */
+#work{background:var(--e2);}
+.work-filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:3rem;}
+.wf-btn{
+  font-family:var(--mo);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;
+  background:transparent;border:1px solid var(--bd2);color:var(--c4);
+  padding:.45rem 1.1rem;cursor:none;transition:all .3s;
+}
+.wf-btn:hover{border-color:rgba(194,80,31,.35);color:var(--c2);}
+.wf-btn.active{background:var(--s);border-color:var(--s);color:var(--c);}
+.work-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:1px;background:var(--bd);border:1px solid var(--bd);
+}
+.work-card{
+  position:relative;overflow:hidden;background:var(--e3);
+  aspect-ratio:16/10;cursor:none;
+}
+.work-card.hidden{display:none;}
+.work-bg{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  transition:transform .6s cubic-bezier(.4,0,.2,1);
+  filter:brightness(.6);
+}
+.work-card:hover .work-bg{transform:scale(1.06);filter:brightness(.35);}
+.work-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(26,15,7,.95) 0%,rgba(26,15,7,.3) 55%,transparent 100%);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:1.25rem;
+}
+.work-cat{
+  font-family:var(--mo);font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--s2);margin-bottom:.35rem;
+}
+.work-title{font-size:.9rem;font-weight:500;color:var(--c);line-height:1.3;}
+.work-play{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(194,80,31,.9);
+  display:flex;align-items:center;justify-content:center;
+  opacity:.75;transition:opacity .3s,transform .3s;
+}
+.work-play svg{width:20px;height:20px;fill:var(--c);margin-left:4px;}
+.work-card:hover .work-play{opacity:1;transform:translate(-50%,-50%) scale(1.1);}
+
+/* Lightbox */
+.lb{
+  position:fixed;inset:0;z-index:500;
+  background:rgba(8,4,1,.96);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .35s;
+  backdrop-filter:blur(10px);
+}
+.lb.open{opacity:1;pointer-events:all;}
+.lb-inner{position:relative;width:min(920px,92vw);}
+.lb-close{
+  position:absolute;top:-2.5rem;right:0;
+  background:none;border:none;
+  font-family:var(--mo);font-size:.68rem;letter-spacing:.14em;
+  color:var(--c4);cursor:none;transition:color .3s;
+}
+.lb-close:hover{color:var(--s2);}
+.lb-video{position:relative;width:100%;padding-bottom:56.25%;background:var(--e);}
+.lb-video iframe{position:absolute;inset:0;width:100%;height:100%;border:none;}
+.lb-meta{margin-top:1rem;display:flex;align-items:center;gap:1rem;}
+.lb-cat{font-family:var(--mo);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;color:var(--s);white-space:nowrap;}
+.lb-title{font-size:.95rem;font-weight:500;color:var(--c2);}
+
+/* ── EXPERIENCE ── */
+#experience{background:var(--e2);}
+.exp-grid{display:grid;grid-template-columns:260px 1fr;gap:5rem;}
+.exp-side{position:sticky;top:120px;height:fit-content;}
+.exp-co{font-family:var(--bb);font-size:2rem;letter-spacing:.04em;margin-bottom:.4rem;line-height:.95;}
+.exp-type{font-family:var(--mo);font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--c4);margin-bottom:1.5rem;}
+.exp-period{font-family:var(--mo);font-size:.6rem;letter-spacing:.12em;color:var(--s);border-top:1px solid var(--bd2);padding-top:1.25rem;margin-bottom:1rem;}
+.exp-note{font-size:.8rem;color:var(--c4);line-height:1.65;}
+.eitem{padding:2rem 0;border-bottom:1px solid var(--bd2);display:grid;grid-template-columns:2.5rem 1fr;gap:1.5rem;align-items:start;}
+.eitem:first-child{border-top:1px solid var(--bd2);}
+.enum{font-family:var(--mo);font-size:.54rem;color:var(--s);letter-spacing:.1em;padding-top:.35rem;}
+.etitle{font-size:1rem;font-weight:500;margin-bottom:.45rem;}
+.ebody{font-size:.83rem;color:var(--c2);line-height:1.7;}
+
+/* ── SERVICES ── */
+#services{background:var(--e);}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--bd);}
+.svc{padding:2.5rem;border-right:1px solid var(--bd);border-bottom:1px solid var(--bd);transition:background .3s;position:relative;overflow:hidden;}
+.svc:nth-child(3n){border-right:none;}
+.svc:nth-last-child(-n+3){border-bottom:none;}
+.svc:hover{background:rgba(194,80,31,.04);}
+.svc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:0;background:var(--s);transition:height .35s;}
+.svc:hover::after{height:1px;}
+.svc-n{font-family:var(--mo);font-size:.54rem;color:var(--s);letter-spacing:.1em;margin-bottom:1.25rem;}
+.svc-t{font-size:.975rem;font-weight:500;margin-bottom:.65rem;}
+.svc-b{font-size:.78rem;color:var(--c4);line-height:1.7;margin-bottom:1.25rem;}
+.svc-chips{display:flex;flex-wrap:wrap;gap:.35rem;}
+.chip{font-family:var(--mo);font-size:.51rem;letter-spacing:.08em;text-transform:uppercase;background:rgba(194,80,31,.08);color:var(--s2);border:1px solid rgba(194,80,31,.2);padding:.22rem .55rem;}
+
+/* ── AWARDS ── */
+#awards{background:var(--e2);}
+.aw-ctx{display:grid;grid-template-columns:1fr 1fr;gap:4rem;margin-bottom:4rem;}
+.aw-desc{font-size:.95rem;color:var(--c2);line-height:1.85;}
+.aw-desc p{margin-bottom:1rem;}
+.aw-desc strong{color:var(--c);font-weight:500;}
+.aw-box{border:1px solid var(--bd);padding:2rem;font-size:.8rem;color:var(--c4);line-height:1.7;background:rgba(194,80,31,.03);}
+.aw-box-lbl{font-family:var(--mo);font-size:.54rem;letter-spacing:.15em;text-transform:uppercase;color:var(--s);margin-bottom:.75rem;}
+.aw-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--bd);border:1px solid var(--bd);}
+.awc{background:var(--e2);padding:3rem;transition:background .3s;}
+.awc:hover{background:var(--e3);}
+.wlm-svg{width:56px;height:56px;margin-bottom:2rem;display:block;}
+.aw-badge{display:inline-block;font-family:var(--mo);font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;background:rgba(194,80,31,.1);color:var(--s2);border:1px solid rgba(194,80,31,.25);padding:.3rem .75rem;margin-bottom:1.5rem;}
+.aw-title{font-family:var(--bb);font-size:1.8rem;letter-spacing:.03em;margin-bottom:.65rem;line-height:.95;}
+.aw-sub{font-size:.82rem;color:var(--c2);line-height:1.7;}
+.aw-yr{font-family:var(--mo);font-size:.54rem;color:var(--s);letter-spacing:.1em;margin-top:1.25rem;}
+
+/* ── EDUCATION ── */
+#education{background:var(--e);}
+.edu-row{border:1px solid var(--bd);padding:3rem 3.5rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.edu-deg{font-family:var(--bb);font-size:2rem;letter-spacing:.04em;margin-bottom:.5rem;line-height:.95;}
+.edu-b{font-size:.875rem;color:var(--c2);line-height:1.7;}
+.edu-right{text-align:right;}
+.edu-badge{display:inline-block;font-family:var(--mo);font-size:.56rem;letter-spacing:.14em;text-transform:uppercase;border:1px solid rgba(194,80,31,.3);color:var(--s);padding:.55rem 1.4rem;margin-bottom:1rem;}
+.edu-note{font-size:.8rem;color:var(--c4);line-height:1.65;}
+.edu-note strong{color:var(--s2);font-weight:400;}
+
+/* ── CONTACT ── */
+#contact{background:var(--e3);border-top:1px solid var(--bd);}
+.con-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:6rem;align-items:start;}
+.con-big{font-family:var(--bb);font-size:clamp(3rem,7.5vw,6rem);letter-spacing:.03em;line-height:.88;}
+.con-big .si{color:var(--s2);}
+.con-sub{font-size:.95rem;color:var(--c2);margin-top:1.5rem;line-height:1.75;max-width:420px;}
+.con-links{display:flex;flex-direction:column;}
+.clink{display:flex;justify-content:space-between;align-items:center;padding:1.2rem 0;border-bottom:1px solid var(--bd2);text-decoration:none;transition:all .3s;}
+.clink:first-child{border-top:1px solid var(--bd2);}
+.cl-left{display:flex;flex-direction:column;gap:.12rem;}
+.cl-lbl{font-family:var(--mo);font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;color:var(--c4);}
+.cl-val{font-size:.9rem;color:var(--c2);transition:color .3s;}
+.clink:hover .cl-val{color:var(--s2);}
+.cl-arr{color:rgba(194,80,31,.3);font-size:1rem;transition:transform .3s,color .3s;}
+.clink:hover .cl-arr{transform:translate(4px,-4px);color:var(--s2);}
+
+/* Footer */
+footer{background:var(--e);border-top:1px solid var(--bd);padding:2rem 4rem;display:flex;justify-content:space-between;align-items:center;}
+.fmark{font-family:var(--mo);font-size:.66rem;color:var(--c4);letter-spacing:.08em;}
+.fright{font-family:var(--mo);font-size:.56rem;color:rgba(122,96,64,.4);letter-spacing:.08em;}
+
+/* ── MOBILE ── */
+@media(max-width:900px){
+  nav{padding:1.25rem 1.5rem;}
+  nav.sc{padding:1rem 1.5rem;}
+  .nlinks,.ncta{display:none;}
+  .hbg{display:flex;}
+  #hero{padding:0 1.5rem;}
+  .h-side-l,.h-side-r{display:none;}
+  .h-fullname{font-size:clamp(3.5rem,15vw,6.5rem);letter-spacing:.02em;}
+  .h-tagline-txt{font-size:.65rem;white-space:normal;}
+  .h-tagline-cut{gap:.75rem;margin-top:1rem;}
+  .h-bottom{flex-direction:column;gap:2rem;align-items:flex-start;}
+  .h-ctas{flex-direction:column;align-items:flex-start;}
+  .h-stats{flex-wrap:wrap;}
+  .hst{padding:.75rem 1.5rem 0 0;margin-right:1.5rem;}
+  .wrap{padding:5rem 1.5rem;}
+  .ab-grid{grid-template-columns:1fr;gap:3rem;}
+  .ab-right{display:none;}
+  .sk-intro{grid-template-columns:1fr;gap:2rem;}
+  .work-grid{grid-template-columns:1fr;}
+  .work-card{aspect-ratio:16/9;}
+  .work-play{opacity:1;}
+  .work-thumb{filter:brightness(.55);}
+  .lb-inner{width:95vw;}
+  .exp-grid{grid-template-columns:1fr;gap:2.5rem;}
+  .exp-side{position:static;}
+  .svc-grid{grid-template-columns:1fr;}
+  .svc{border-right:none;}
+  .svc:nth-last-child(-n+3){border-bottom:1px solid var(--bd);}
+  .svc:last-child{border-bottom:none;}
+  .aw-ctx{grid-template-columns:1fr;gap:2rem;}
+  .aw-grid{grid-template-columns:1fr;}
+  .edu-row{grid-template-columns:1fr;gap:2rem;padding:2rem;}
+  .edu-right{text-align:left;}
+  .con-grid{grid-template-columns:1fr;gap:3rem;}
+  footer{flex-direction:column;gap:1rem;padding:2rem 1.5rem;text-align:center;}
+  body{cursor:auto;}
+  .cur,.cur-ring{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="cur" id="cur"></div>
+<div class="cur-ring" id="cur-ring"></div>
+
+<!-- Mobile menu -->
+<div class="mm" id="mm">
+  <button class="mm-close" onclick="tmm()">[CLOSE]</button>
+  <a href="#about" onclick="tmm()">About</a>
+  <a href="#skills" onclick="tmm()">Skills</a>
+  <a href="#experience" onclick="tmm()">Experience</a>
+  <a href="#services" onclick="tmm()">Services</a>
+  <a href="#awards" onclick="tmm()">Awards</a>
+  <a href="#contact" onclick="tmm()">Contact</a>
+</div>
+
+<nav id="nav">
+  <a href="#hero" class="nlogo">AR<span>J</span>UN</a>
+  <ul class="nlinks">
+    <li><a href="#about">About</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#awards">Awards</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="ncta">Hire Me</a>
+  <button class="hbg" onclick="tmm()"><span></span><span></span><span></span></button>
+</nav>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+  <div class="h-vig"></div>
+  <div class="h-corner tl"></div>
+  <div class="h-corner tr"></div>
+  <div class="h-corner bl"></div>
+  <div class="h-corner br"></div>
+  <div class="h-side-l" id="hsl">Photographer · Videographer · Drone Pilot</div>
+  <div class="h-side-r" id="hsr">behance.net/letsgo20 · @fotofabrik_pro</div>
+
+  <div class="h-inner">
+
+    <p class="h-credit" id="hcredit">Visual &nbsp;Storyteller &nbsp;·&nbsp; Delhi, India</p>
+
+    <div class="h-name-row">
+      <span class="h-name-display" id="hname"></span><span class="h-cursor" id="hcursor"></span>
+    </div>
+
+    <div class="h-divider" id="hdivider"></div>
+
+    <div class="h-tagline-block" id="htagline">
+      <p class="h-tagline-main">
+        I don't just shoot locations —&nbsp;<em>I build the visual identity</em><br>
+        of spaces that demand to be seen.
+      </p>
+      <p class="h-tagline-sub">Architectural Photography &nbsp;·&nbsp; Aerial Drone &nbsp;·&nbsp; Video Production</p>
+    </div>
+
+    <div class="h-bottom" id="hbottom">
+      <div class="h-stats">
+        <div class="hst"><div class="hst-n">5+</div><div class="hst-l">Yrs Photography</div></div>
+        <div class="hst"><div class="hst-n">2+</div><div class="hst-l">Yrs Videography</div></div>
+        <div class="hst"><div class="hst-n">4×</div><div class="hst-l">Award Winner</div></div>
+        <div class="hst"><div class="hst-n">&#x221E;</div><div class="hst-l">Frames Captured</div></div>
+      </div>
+      <div class="h-ctas">
+        <a href="https://www.behance.net/letsgo20" target="_blank" class="btn-p">View Portfolio →</a>
+        <a href="#contact" class="btn-g">Let's collaborate</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="mq-wrap">
+  <div class="mq-track">
+    <span class="mi">Architectural Photography</span><span class="mi ac">Oberoi Realty</span>
+    <span class="mi">Aerial Drone</span><span class="mi ac">Signature Global</span>
+    <span class="mi">Video Editing</span><span class="mi ac">4× Award Winner</span>
+    <span class="mi">Podcast Production</span><span class="mi ac">Wiki Loves Monuments</span>
+    <span class="mi">Colour Grading</span><span class="mi ac">Delhi NCR</span>
+    <span class="mi">EDM Design</span><span class="mi ac">Premiere Pro</span>
+    <span class="mi">Architectural Photography</span><span class="mi ac">Oberoi Realty</span>
+    <span class="mi">Aerial Drone</span><span class="mi ac">Signature Global</span>
+    <span class="mi">Video Editing</span><span class="mi ac">4× Award Winner</span>
+    <span class="mi">Podcast Production</span><span class="mi ac">Wiki Loves Monuments</span>
+    <span class="mi">Colour Grading</span><span class="mi ac">Delhi NCR</span>
+    <span class="mi">EDM Design</span><span class="mi ac">Premiere Pro</span>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="wrap">
+    <p class="slbl r">About Me</p>
+    <div class="ab-grid">
+      <div class="ab-body">
+        <h2 class="stit r d1">A Visual Pro<br>with <span class="si">Purpose.</span></h2>
+        <p class="r d2">I'm Arjun — a Delhi-based <strong>photographer, videographer, and drone pilot</strong> with over five years of experience crafting images that don't just document — they persuade, inspire, and sell.</p>
+        <p class="r d2">My work sits at the intersection of <strong>architecture, luxury real estate, and cinematic storytelling</strong>. From aerial overviews of premium developments to precision interior photography and long-format brand films, I manage the complete production pipeline — concept, shoot, edit, grade, deliver.</p>
+
+        <div class="ab-quad r d3">
+          <div class="qc"><div class="qn">5+</div><div class="ql">Years Photography</div></div>
+          <div class="qc"><div class="qn">2+</div><div class="ql">Years Videography</div></div>
+          <div class="qc"><div class="qn">4×</div><div class="ql">Award Winner</div></div>
+          <div class="qc"><div class="qn">3</div><div class="ql">Languages</div></div>
+        </div>
+      </div>
+      <div class="ab-right r d2">
+        <div class="acard"><div class="acard-bar"></div><div class="acard-tag">Specialisation</div><div class="acard-title">Luxury Real Estate Media</div><div class="acard-body">End-to-end visual production for premium residential and commercial real estate — photography, drone footage, promotional video, and campaign design. I understand what luxury buyers need to see.</div></div>
+        <div class="acard"><div class="acard-bar"></div><div class="acard-tag">Recognition</div><div class="acard-title">Internationally Awarded Photographer</div><div class="acard-body">3 national + 1 international win at the Wikipedia Loves Monuments Photography Competition — one of the world's largest open photography contests with over 350,000 entries globally.</div></div>
+        <div class="acard"><div class="acard-bar"></div><div class="acard-tag">Languages</div><div class="acard-title">Multilingual Communicator</div><div class="acard-body">Fluent English, native Hindi, and conversational German — enabling collaboration with diverse clients, international brands, and cross-border creative teams.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrap">
+    <p class="slbl r">Expertise</p>
+    <div class="sk-intro">
+      <div>
+        <h2 class="stit r d1">Skills &<br><span class="si">Craft.</span></h2>
+        <div class="sk-intro-txt r d2">
+          <p>My skill set spans the full arc of visual production — from the first location scout to the final colour-graded export. I work in <strong>real estate, architecture, and luxury media</strong>, where precision and aesthetics are non-negotiable.</p>
+          <p>Every tool I use serves one goal: <strong>making properties look as transformative on screen as they feel in person.</strong> That means mastering light, lenses, movement in post, and knowing how to tell a story through built form.</p>
+          <p>I'm actively expanding into <strong>creative direction</strong> — developing the conceptual and communication skills to lead full campaigns from brief to broadcast, not just execute them.</p>
+        </div>
+      </div>
+      <div class="r d2">
+        <div class="skit"><div class="sk-head"><span class="sk-name">Photography</span><span class="sk-pct" data-pct="95">0%</span></div><div class="sk-desc">Architectural stills, real estate interiors, drone-down compositions. 5+ years reading light in complex built environments — natural, golden hour, and controlled artificial.</div><div class="sk-track"><div class="sk-fill" data-w="95"></div></div><div class="sk-chips"><span class="skchip">Architecture</span><span class="skchip">Real Estate</span><span class="skchip">Documentary</span></div></div>
+        <div class="skit"><div class="sk-head"><span class="sk-name">Videography</span><span class="sk-pct" data-pct="88">0%</span></div><div class="sk-desc">Multi-camera setups, cinematic movement, deliberate framing. At ease on a gimbal in a tight apartment corridor or wide on a rooftop at golden hour.</div><div class="sk-track"><div class="sk-fill" data-w="88"></div></div><div class="sk-chips"><span class="skchip">Cinematic</span><span class="skchip">Multi-Cam</span><span class="skchip">Podcast</span></div></div>
+        <div class="skit"><div class="sk-head"><span class="sk-name">Drone Piloting</span><span class="sk-pct" data-pct="85">0%</span></div><div class="sk-desc">Aerial cinematography with DJI systems. Site overviews, fly-throughs, reveal sequences, and proximity shots for real estate and infrastructure documentation.</div><div class="sk-track"><div class="sk-fill" data-w="85"></div></div><div class="sk-chips"><span class="skchip">DJI</span><span class="skchip">Aerial</span><span class="skchip">4K</span></div></div>
+        <div class="skit"><div class="sk-head"><span class="sk-name">Video Editing</span><span class="sk-pct" data-pct="90">0%</span></div><div class="sk-desc">Segment-wise editing, pacing, audio sync, transitions, and final export. Premiere Pro as primary — CapCut for rapid social deliverables, After Effects for motion elements.</div><div class="sk-track"><div class="sk-fill" data-w="90"></div></div><div class="sk-chips"><span class="skchip">Premiere Pro</span><span class="skchip">CapCut</span><span class="skchip">After Effects</span></div></div>
+        <div class="skit"><div class="sk-head"><span class="sk-name">Colour Grading</span><span class="sk-pct" data-pct="83">0%</span></div><div class="sk-desc">LUT crafting, primary + secondary correction, skin-tone matching, and the warm-neutral palette luxury real estate brands demand.</div><div class="sk-track"><div class="sk-fill" data-w="83"></div></div><div class="sk-chips"><span class="skchip">LUTs</span><span class="skchip">Lightroom</span><span class="skchip">Cinematic</span></div></div>
+        <div class="skit"><div class="sk-head"><span class="sk-name">Creative Direction</span><span class="sk-pct" data-pct="72">0%</span></div><div class="sk-desc">Developing — translating a client brief into a full visual concept: shot lists, mood boards, campaign strategy, and on-set leadership for end-to-end productions.</div><div class="sk-track"><div class="sk-fill" data-w="72"></div></div><div class="sk-chips"><span class="skchip">Concept</span><span class="skchip">Direction</span><span class="skchip">Strategy</span></div></div>
+      </div>
+    </div>
+    <div class="tools-sec r d3">
+      <div class="tools-lbl">— Tools & Software</div>
+      <div class="tools-row">
+        <div class="tblock"><div class="tname">Adobe Premiere Pro</div><div class="tcat">Video Editing</div></div>
+        <div class="tblock"><div class="tname">After Effects</div><div class="tcat">Motion Graphics</div></div>
+        <div class="tblock"><div class="tname">Lightroom Classic</div><div class="tcat">Photo Retouching</div></div>
+        <div class="tblock"><div class="tname">CapCut Pro</div><div class="tcat">Social Editing</div></div>
+        <div class="tblock"><div class="tname">DJI Drone Suite</div><div class="tcat">Aerial Capture</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section id="work">
+  <div class="wrap">
+    <p class="slbl r">Portfolio</p>
+    <h2 class="stit r d1">Work I've<br><span class="si">Done.</span></h2>
+    <div class="work-filters r d2">
+      <button class="wf-btn active" data-filter="all">All</button>
+      <button class="wf-btn" data-filter="drone">Aerial Drone</button>
+      <button class="wf-btn" data-filter="walkthrough">Walkthrough</button>
+      <button class="wf-btn" data-filter="informative">Informative</button>
+    </div>
+    <div class="work-grid r d3">
+
+      <div class="work-card" data-cat="drone" data-id="sNsDxRmn5Es" data-title="Road Map & Land Parcel — Site Overview" data-cat-label="Aerial Drone">
+        <div class="work-bg" style="background-image:url('https://i.ytimg.com/vi/sNsDxRmn5Es/hqdefault.jpg')"></div>
+        <div class="work-overlay">
+          <div class="work-cat">Aerial Drone</div>
+          <div class="work-title">Road Map & Land Parcel — Site Overview</div>
+        </div>
+        <div class="work-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="work-card" data-cat="drone" data-id="C5ARK-BBcKs" data-title="Project Site Documentation — Aerial View" data-cat-label="Aerial Drone">
+        <div class="work-bg" style="background-image:url('https://i.ytimg.com/vi/C5ARK-BBcKs/hqdefault.jpg')"></div>
+        <div class="work-overlay">
+          <div class="work-cat">Aerial Drone</div>
+          <div class="work-title">Project Site Documentation — Aerial View</div>
+        </div>
+        <div class="work-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="work-card" data-cat="drone" data-id="uA4_PIOhUqg" data-title="Land Parcel Mapping — Cinematic Aerial" data-cat-label="Aerial Drone">
+        <div class="work-bg" style="background-image:url('https://i.ytimg.com/vi/uA4_PIOhUqg/hqdefault.jpg')"></div>
+        <div class="work-overlay">
+          <div class="work-cat">Aerial Drone</div>
+          <div class="work-title">Land Parcel Mapping — Cinematic Aerial</div>
+        </div>
+        <div class="work-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="work-card" data-cat="drone" data-id="R-oe9cwdxeM" data-title="Road Map Overview — Project Site" data-cat-label="Aerial Drone">
+        <div class="work-bg" style="background-image:url('https://i.ytimg.com/vi/R-oe9cwdxeM/hqdefault.jpg')"></div>
+        <div class="work-overlay">
+          <div class="work-cat">Aerial Drone</div>
+          <div class="work-title">Road Map Overview — Project Site</div>
+        </div>
+        <div class="work-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="work-card" data-cat="informative" data-id="BtKt-doCzZo" data-title="Real Estate Informative Video" data-cat-label="Informative">
+        <div class="work-bg" style="background-image:url('https://i.ytimg.com/vi/BtKt-doCzZo/hqdefault.jpg')"></div>
+        <div class="work-overlay">
+          <div class="work-cat">Informative</div>
+          <div class="work-title">Real Estate Informative Video</div>
+        </div>
+        <div class="work-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+      <div class="work-card" data-cat="drone walkthrough" data-id="rBUmu08OKwA" data-title="TARC Ishva — Site Drone & Sample Apartment" data-cat-label="Aerial Drone · Walkthrough">
+        <div class="work-bg" style="background-image:url('https://i.ytimg.com/vi/rBUmu08OKwA/hqdefault.jpg')"></div>
+        <div class="work-overlay">
+          <div class="work-cat">Aerial Drone · Walkthrough</div>
+          <div class="work-title">TARC Ishva — Site Drone & Sample Apartment</div>
+        </div>
+        <div class="work-play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb">
+  <div class="lb-inner">
+    <button class="lb-close" id="lb-close">[ CLOSE ]</button>
+    <div class="lb-video">
+      <iframe id="lb-iframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+    </div>
+    <div class="lb-meta">
+      <div class="lb-cat" id="lb-cat"></div>
+      <div class="lb-title" id="lb-title"></div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="wrap">
+    <p class="slbl r">Work Experience</p>
+    <h2 class="stit r d1">Career <span class="si">Timeline.</span></h2>
+    <div class="exp-grid r d2">
+      <div class="exp-side">
+        <div class="exp-co">Aganyi Infra<br>Resources</div>
+        <div class="exp-type">Real Estate Brokerage · Delhi NCR</div>
+        <div class="exp-period">2023 — Present</div>
+        <div class="exp-note">Full-time Architectural & Visual Content Creator across residential, commercial, and luxury real estate. Clients include Oberoi Realty and Signature Global.</div>
+      </div>
+      <div>
+        <div class="eitem"><div class="enum">01</div><div><div class="etitle">Architectural Photography</div><div class="ebody">Executed precision architectural photography across residential and commercial projects — capturing structures, interiors, and amenities with aesthetic depth and technical accuracy for marketing and documentation.</div></div></div>
+        <div class="eitem"><div class="enum">02</div><div><div class="etitle">Aerial Drone Cinematography</div><div class="ebody">Produced cinematic drone footage of project sites, under-construction developments, and completed properties. Delivered sweeping overviews and reveal sequences for client pitch decks, social campaigns, and investor presentations.</div></div></div>
+        <div class="eitem"><div class="enum">03</div><div><div class="etitle">Promotional & Brand Video Production</div><div class="ebody">Conceptualised, shot, and edited promotional films, educational content, and long-format documentaries. Managed creative direction alongside technical execution — scripting, shot planning, grading, and final delivery.</div></div></div>
+        <div class="eitem"><div class="enum">04</div><div><div class="etitle">Podcast Recording & Direction</div><div class="ebody">Directed and post-produced multi-camera podcasts from pre-production through broadcast-ready output — managing camera positioning, audio sync, lighting, and on-set direction.</div></div></div>
+        <div class="eitem"><div class="enum">05</div><div><div class="etitle">EDM Design & Campaign Production</div><div class="ebody">Designed Electronic Direct Mailers aligned with campaign briefs, brand guidelines, and real estate marketing objectives — balancing visual hierarchy, typography, and asset quality.</div></div></div>
+        <div class="eitem"><div class="enum">06</div><div><div class="etitle">End-to-End Production Pipeline</div><div class="ebody">Owned the full video production pipeline: shoot planning, footage organisation, segment-wise editing, colour grading, audio mastering, and final export across web, broadcast, and print formats.</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="wrap">
+    <p class="slbl r">What I Offer</p>
+    <h2 class="stit r d1">Services &<br><span class="si">Deliverables.</span></h2>
+    <div class="svc-grid r d2">
+      <div class="svc"><div class="svc-n">01</div><div class="svc-t">Architectural Photography</div><div class="svc-b">Precision stills of residential and commercial structures — scale, materials, light, and aspiration. Delivered for print, web, and campaign use.</div><div class="svc-chips"><span class="chip">Real Estate</span><span class="chip">Commercial</span><span class="chip">Interiors</span></div></div>
+      <div class="svc"><div class="svc-n">02</div><div class="svc-t">Aerial Drone Photography & Video</div><div class="svc-b">Sweeping 4K aerial sequences and stills of properties and project sites — perspectives ground-level cameras can't reach.</div><div class="svc-chips"><span class="chip">DJI Drone</span><span class="chip">4K Aerial</span><span class="chip">Site Overviews</span></div></div>
+      <div class="svc"><div class="svc-n">03</div><div class="svc-t">Promotional & Long-Format Video</div><div class="svc-b">Brand films, property walk-throughs, and documentaries — conceptualised, shot, edited, and graded in-house. Every frame intentional.</div><div class="svc-chips"><span class="chip">Brand Films</span><span class="chip">Documentary</span><span class="chip">Walk-throughs</span></div></div>
+      <div class="svc"><div class="svc-n">04</div><div class="svc-t">Podcast Production</div><div class="svc-b">Multi-camera recording, on-set direction, audio sync, and full post-production for real estate brands and industry voices.</div><div class="svc-chips"><span class="chip">Multi-Cam</span><span class="chip">Audio Sync</span><span class="chip">Post-Production</span></div></div>
+      <div class="svc"><div class="svc-n">05</div><div class="svc-t">EDM Design & Production</div><div class="svc-b">Campaign-aligned Electronic Direct Mailers with visual hierarchy, brand precision, and conversion intent for real estate audiences.</div><div class="svc-chips"><span class="chip">Design</span><span class="chip">Campaign</span><span class="chip">Real Estate</span></div></div>
+      <div class="svc"><div class="svc-n">06</div><div class="svc-t">Colour Grading & Post-Production</div><div class="svc-b">Cinematic colour science, segment editing, audio polish, and export-ready finishing for broadcast, social, and digital platforms.</div><div class="svc-chips"><span class="chip">Colour Science</span><span class="chip">LUTs</span><span class="chip">Finishing</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- AWARDS -->
+<section id="awards">
+  <div class="wrap">
+    <p class="slbl r">Recognition</p>
+    <h2 class="stit r d1">Awards &<br><span class="si">Honours.</span></h2>
+    <div class="aw-ctx r d2">
+      <div class="aw-desc">
+        <p>The <strong>Wiki Loves Monuments</strong> competition is one of the largest open photography contests in the world — hundreds of thousands of entries annually from six continents.</p>
+        <p>Winning at this level — especially internationally — signals <strong>genuine photographic mastery</strong>: composition, technical quality, cultural sensitivity, and the ability to find meaning in built heritage.</p>
+      </div>
+      <div class="aw-box"><div class="aw-box-lbl">About the Competition</div>Supported by the Wikimedia Foundation and UNESCO, Wiki Loves Monuments runs across 50+ countries. In peak years it attracted over 350,000 photographs from 15,000+ participants — making any national or global win exceptional.</div>
+    </div>
+    <div class="aw-grid r d3">
+      <div class="awc">
+        <svg class="wlm-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="22" width="48" height="34" rx="3" fill="none" stroke="#D96830" stroke-width="1.5"/>
+          <rect x="23" y="16" width="18" height="9" rx="2" fill="none" stroke="#D96830" stroke-width="1.5"/>
+          <circle cx="32" cy="38" r="10" fill="none" stroke="#D96830" stroke-width="1.5"/>
+          <circle cx="32" cy="38" r="5.5" fill="none" stroke="rgba(194,80,31,.35)" stroke-width="1"/>
+          <g transform="translate(32,38)" fill="#D96830" opacity=".75"><rect x="-3.5" y="-2.5" width="1.8" height="5.5" rx=".4"/><rect x="1.7" y="-2.5" width="1.8" height="5.5" rx=".4"/><polygon points="-4.5,-2.5 4.5,-2.5 0,-6.5"/></g>
+          <circle cx="13" cy="26" r="1.8" fill="#D96830" opacity=".5"/>
+        </svg>
+        <div class="aw-badge">3× National Winner</div>
+        <div class="aw-title">WIKI LOVES<br>MONUMENTS — INDIA</div>
+        <div class="aw-sub">Three national-level wins recognised for excellence in architectural heritage documentation — composition, technical quality, and cultural significance.</div>
+        <div class="aw-yr">Wiki Loves Monuments · India Category</div>
+      </div>
+      <div class="awc">
+        <svg class="wlm-svg" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <rect x="8" y="22" width="48" height="34" rx="3" fill="none" stroke="#D96830" stroke-width="1.5"/>
+          <rect x="23" y="16" width="18" height="9" rx="2" fill="none" stroke="#D96830" stroke-width="1.5"/>
+          <circle cx="32" cy="38" r="10" fill="none" stroke="#D96830" stroke-width="1.5"/>
+          <ellipse cx="32" cy="38" rx="10" ry="5" fill="none" stroke="rgba(194,80,31,.2)" stroke-width="1" stroke-dasharray="2,2"/>
+          <line x1="22" y1="38" x2="42" y2="38" stroke="rgba(194,80,31,.2)" stroke-width="1"/>
+          <circle cx="32" cy="38" r="5.5" fill="none" stroke="rgba(194,80,31,.35)" stroke-width="1"/>
+          <g transform="translate(32,38)" fill="#D96830" opacity=".75"><rect x="-3.5" y="-2.5" width="1.8" height="5.5" rx=".4"/><rect x="1.7" y="-2.5" width="1.8" height="5.5" rx=".4"/><polygon points="-4.5,-2.5 4.5,-2.5 0,-6.5"/></g>
+          <circle cx="13" cy="26" r="1.8" fill="#D96830" opacity=".5"/>
+        </svg>
+        <div class="aw-badge">1× International Winner</div>
+        <div class="aw-title">WIKI LOVES<br>MONUMENTS — GLOBAL</div>
+        <div class="aw-sub">One of a handful of Indian photographers to win globally — competing against entries from 50+ countries. World-class image quality, composition, and photographic impact.</div>
+        <div class="aw-yr">Wiki Loves Monuments · International Category</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="wrap">
+    <p class="slbl r">Education</p>
+    <h2 class="stit r d1">Academic <span class="si">Background.</span></h2>
+    <div class="edu-row r d2">
+      <div>
+        <div class="edu-deg">Senior Secondary — Class XII</div>
+        <div class="edu-b">Formal secondary education completed. Professional development driven by self-directed mastery, on-the-job learning, and a relentless commitment to craft — working alongside senior creatives in demanding real estate media environments.</div>
+      </div>
+      <div class="edu-right">
+        <div class="edu-badge">Completed</div>
+        <div class="edu-note">Deepening expertise in <strong>creative direction</strong> and <strong>client communication</strong> — the skills that elevate a technician to a trusted creative partner.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="wrap">
+    <div class="con-grid">
+      <div>
+        <p class="slbl r">Get In Touch</p>
+        <h2 class="con-big r d1">LET'S<br>BUILD<br><span class="si">SOMETHING<br>REMARKABLE.</span></h2>
+        <p class="con-sub r d2">Available for luxury real estate campaigns, aerial drone shoots, brand films, podcast production, and long-format projects across Delhi NCR and beyond.</p>
+      </div>
+      <div class="con-links r d2">
+        <a href="mailto:Arjunfotografer@gmail.com" class="clink"><div class="cl-left"><span class="cl-lbl">Email</span><span class="cl-val">Arjunfotografer@gmail.com</span></div><span class="cl-arr">↗</span></a>
+        <a href="https://www.behance.net/letsgo20" target="_blank" class="clink"><div class="cl-left"><span class="cl-lbl">Behance Portfolio</span><span class="cl-val">behance.net/letsgo20</span></div><span class="cl-arr">↗</span></a>
+        <a href="https://www.instagram.com/fotofabrik_pro" target="_blank" class="clink"><div class="cl-left"><span class="cl-lbl">Instagram</span><span class="cl-val">@fotofabrik_pro</span></div><span class="cl-arr">↗</span></a>
+        <a href="tel:+917982368282" class="clink"><div class="cl-left"><span class="cl-lbl">Phone</span><span class="cl-val">+91 79823 68282</span></div><span class="cl-arr">↗</span></a>
+        <a href="#" class="clink"><div class="cl-left"><span class="cl-lbl">Location</span><span class="cl-val">Delhi, India</span></div><span class="cl-arr">↗</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="fmark">ARJUN · Visual Storyteller · Delhi</div>
+  <div class="fright">© 2024 · All rights reserved · behance.net/letsgo20</div>
+</footer>
+
+<script>
+// Cursor
+const C=document.getElementById('cur'),R=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;C.style.left=mx+'px';C.style.top=my+'px';});
+(function loop(){rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;R.style.left=rx+'px';R.style.top=ry+'px';requestAnimationFrame(loop);})();
+document.querySelectorAll('a,button,.svc,.awc,.acard,.tblock').forEach(el=>{
+  el.addEventListener('mouseenter',()=>R.classList.add('big'));
+  el.addEventListener('mouseleave',()=>R.classList.remove('big'));
+});
+
+// Nav scroll
+const nav=document.getElementById('nav');
+window.addEventListener('scroll',()=>nav.classList.toggle('sc',scrollY>60));
+
+// Mobile menu
+function tmm(){document.getElementById('mm').classList.toggle('open');}
+
+// ── TYPEWRITER HERO SEQUENCE ──
+const hname    = document.getElementById('hname');
+const hcursor  = document.getElementById('hcursor');
+const hcredit  = document.getElementById('hcredit');
+const hdivider = document.getElementById('hdivider');
+const htagline = document.getElementById('htagline');
+const hbottom  = document.getElementById('hbottom');
+const hsl      = document.getElementById('hsl');
+const hsr      = document.getElementById('hsr');
+const WORD     = 'ARJUN';
+let   idx      = 0;
+
+// Step 1 — label fades in at 400ms
+setTimeout(()=>{ hcredit.style.opacity='1'; }, 400);
+
+// Step 2 — typewriter starts at 1000ms, one letter every 160ms
+function typeNext(){
+  if(idx < WORD.length){
+    hname.textContent += WORD[idx];
+    idx++;
+    setTimeout(typeNext, 160);
+  } else {
+    // Typing done — hide cursor after short pause
+    setTimeout(()=>{ hcursor.style.animation='none'; hcursor.style.opacity='0'; }, 700);
+    // Step 3 — divider expands
+    setTimeout(()=>{ hdivider.style.width='80%'; }, 900);
+    // Step 4 — tagline fades in
+    setTimeout(()=>{ htagline.style.opacity='1'; }, 1300);
+    // Step 5 — bottom row fades in
+    setTimeout(()=>{ hbottom.style.opacity='1'; }, 1700);
+    // Step 6 — side labels
+    setTimeout(()=>{ hsl.style.opacity='1'; hsr.style.opacity='1'; }, 2100);
+  }
+}
+setTimeout(typeNext, 1000);
+
+// Reveal on scroll
+const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('on');}),{threshold:0.08});
+document.querySelectorAll('.r').forEach(el=>obs.observe(el));
+
+// ── WORK FILTERS ──
+document.querySelectorAll('.wf-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.wf-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const f=btn.dataset.filter;
+    document.querySelectorAll('.work-card').forEach(card=>{
+      const cat=card.dataset.cat;
+      if(f==='all'||cat.includes(f)) card.classList.remove('hidden');
+      else card.classList.add('hidden');
+    });
+  });
+});
+
+// ── LIGHTBOX ──
+const lb=document.getElementById('lb');
+const lbIframe=document.getElementById('lb-iframe');
+const lbCat=document.getElementById('lb-cat');
+const lbTitle=document.getElementById('lb-title');
+
+document.querySelectorAll('.work-card').forEach(card=>{
+  card.addEventListener('click',()=>{
+    const id=card.dataset.id;
+    lbIframe.src=`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0&modestbranding=1`;
+    lbCat.textContent=card.dataset.catLabel||card.querySelector('.work-cat').textContent;
+    lbTitle.textContent=card.dataset.title;
+    lb.classList.add('open');
+    document.body.style.overflow='hidden';
+  });
+});
+
+function closeLb(){
+  lb.classList.remove('open');
+  lbIframe.src='';
+  document.body.style.overflow='';
+}
+document.getElementById('lb-close').addEventListener('click',closeLb);
+lb.addEventListener('click',e=>{if(e.target===lb)closeLb();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLb();}); + counters
+const bObs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(!e.isIntersecting)return;
+    e.target.querySelectorAll('.sk-fill').forEach(b=>setTimeout(()=>b.style.width=b.dataset.w+'%',200));
+    e.target.querySelectorAll('.sk-pct').forEach(el=>{
+      const t=parseInt(el.dataset.pct);let c=0;
+      const step=()=>{if(c<t){c=Math.min(c+2,t);el.textContent=c+'%';requestAnimationFrame(step);}};
+      setTimeout(step,200);
+    });
+    bObs.unobserve(e.target);
+  });
+},{threshold:0.15});
+document.querySelectorAll('#skills .r.d2').forEach(g=>bObs.observe(g));
+</script>
+</body>
+</html>
